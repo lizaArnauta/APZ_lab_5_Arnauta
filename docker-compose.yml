@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  consul:
+    image: hashicorp/consul:latest
+    container_name: lab5_consul
+    ports:
+      - "8500:8500"
+    command: agent -dev -client=0.0.0.0
+
+  mongodb:
+    image: mongo:latest
+    container_name: lab3_mongodb
+    ports:
+      - "27017:27017"
+
+  hazelcast1:
+    image: hazelcast/hazelcast:5.3
+    container_name: lab3_hz1
+    ports:
+      - "5701:5701"
+
+  hazelcast2:
+    image: hazelcast/hazelcast:5.3
+    container_name: lab3_hz2
+    ports:
+      - "5702:5701"
+
+  hazelcast3:
+    image: hazelcast/hazelcast:5.3
+    container_name: lab3_hz3
+    ports:
+      - "5703:5701"
+
+  logging1:
+    build: ./logging
+    container_name: lab3_logging1
+    ports:
+      - "8081:8000"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - HAZELCAST_NODES=hazelcast1:5701,hazelcast2:5701,hazelcast3:5701
+    depends_on:
+      - hazelcast1
+      - hazelcast2
+      - hazelcast3
+      - consul
+
+  logging2:
+    build: ./logging
+    container_name: lab3_logging2
+    ports:
+      - "8082:8000"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - HAZELCAST_NODES=hazelcast1:5701,hazelcast2:5701,hazelcast3:5701
+    depends_on:
+      - hazelcast1
+      - hazelcast2
+      - hazelcast3
+      - consul
+
+  logging3:
+    build: ./logging
+    container_name: lab3_logging3
+    ports:
+      - "8083:8000"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - HAZELCAST_NODES=hazelcast1:5701,hazelcast2:5701,hazelcast3:5701
+    depends_on:
+      - hazelcast1
+      - hazelcast2
+      - hazelcast3
+      - consul
+
+  message-service:
+    build: ./message
+    container_name: lab3_message
+    ports:
+      - "8084:8000"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - MONGO_URI=mongodb://mongodb:27017
+    depends_on:
+      - mongodb
+      - consul
+
+  facade:
+    build: ./facade
+    container_name: lab3_facade
+    ports:
+      - "8000:8000"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - LOGGING_URLS=http://logging1:8000,http://logging2:8000,http://logging3:8000
+      - MESSAGE_URL=http://message-service:8000
+    depends_on:
+      - logging1
+      - logging2
+      - logging3
+      - message-service
+      - consul
