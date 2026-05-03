@@ -5,7 +5,7 @@ import time
 import os
 import socket
 import consul
-from counter_service.services.counter_service_logic import counter_logic
+from services.counter_service_logic import counter_logic
 
 app = FastAPI()
 PORT = 8000

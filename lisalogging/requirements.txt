@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+hazelcast-python-client
+httpx
+python-consul2

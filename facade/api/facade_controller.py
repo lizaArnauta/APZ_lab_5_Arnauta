@@ -5,7 +5,7 @@ import time
 import os
 import consul
 import socket
-from facade.services.facade_service import facade_logic
+from services.facade_service import facade_logic
 
 class PrivitiveRequest(BaseModel):
     text: str

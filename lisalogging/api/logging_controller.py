@@ -5,7 +5,7 @@ import os
 import socket
 import consul
 
-from lisalogging.services.logging_service import logging_logic
+from services.logging_service import logging_logic
 
 app = FastAPI()
 class MessageRequest(BaseModel):
